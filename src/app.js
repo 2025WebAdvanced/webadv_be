@@ -1,11 +1,13 @@
+require('dotenv').config();
+
 const express = require('express');
 const mysql = require('mysql2');
 
 const connection = mysql.createConnection({
 	host: 'localhost',
-	user: 'root',
-	password: 'ho020905',
-	port: 3306,
+	user: process.env.USER_NAME,
+	password: process.env.ROOT_PASSWORD,
+	port: process.env.PORT,
 	database: 'test_db'
 });
 
@@ -15,6 +17,7 @@ app.set('port', 8080);
 const getAllUsers = () => {
 	connection.query('select * from users order by id desc', (err, rows, fields) => {
 		if(err) throw err;
+		console.log(rows);
 		return rows;
 	});
 }
