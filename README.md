@@ -89,3 +89,37 @@ cat ~/.ssh/id_rsa.pub
 git clone git@github.com:2025WebAdvanced/webadv_be.git
 ```
 ![9](./readmeIamges/image9.png)
+
+### 5. 서버 실행
+#### 8080포트로 포트포워딩
+```bash
+sudo vim /etc/nginx/sites-available/default
+```
+입력해서 편집
+
+![10](./readmeIamges/image10.png)
+location 블럭 내의 내용 수정 후 저장
+
+프로젝트 폴더로 이동 후 `npm start` 입력 후, 웹 브라우저에서 IP 주소를 입력하면 Express 앱으로 연결된다.
+
+#### nodeJS 프로젝트 서비스 등록
+```bash
+sudo vim /etc/systemd/system/api.service
+```
+![11](./readmeIamges/image11.png)
+서비스 작성 후 저장
+
+```bash
+cd ~/webadv_be/src
+sudo chmod +x app.js
+```
+입력하여 app.js 파일에 실행 권한 추가
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl start api
+sudo systemctl enable api
+sudo systemctl status api
+```
+![12](./readmeIamges/image12.png)
+서비스 정상 실행 확인, 이제 npm start 입력하지 않아도 IP로 접속 시 앱에 접속된다.
