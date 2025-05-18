@@ -23,7 +23,7 @@ const getAllUsers = () => {
 }
 
 app.get('/', (req, res) => {
-    res.send('Hello, Express')
+    res.send('Test github PR');
 })
 
 app.get('/getUsers', (req, res) => {
