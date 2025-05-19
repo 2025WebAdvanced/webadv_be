@@ -2,6 +2,12 @@
 const express = require('express');
 const User = require('../model/authModel');
 const router = express.Router();
+const bcrypt = require('bcrypt');
+
+// 비밀번호 해싱 메소드
+const hashedPassword = async (password) => {
+  return await bcrypt.hash(password, 10);
+}
 
 // 로그인 API 예시
 router.post('/login', (req, res) => {
@@ -56,11 +62,8 @@ router.post('/signup', async (req, res) => {
     }
   });
 
-  // 비밀번호 해싱
-  const hashedPassword = await bcrypt.hash(password, 10);
-
   // 유저 생성
-  User.create({ ...req.body, password: hashedPassword }, (err, data) => {
+  User.create({ ...req.body, password: await hashedPassword(password) }, (err, data) => {
     if (err) {
       console.log(err.message);
       res.status(500).json({
