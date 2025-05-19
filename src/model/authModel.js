@@ -8,7 +8,7 @@ const User = function(user) {
 };
 
 User.create = (user, result) => {
-  sql.query(`INSERT INTO users (email, username, password, createdAt, univ) VALUES (?, ?, ?, NOW(), ?)`,
+  sql.query(`INSERT INTO Users (email, username, password, createdAt, univ) VALUES (?, ?, ?, NOW(), ?)`,
     [ user.email, user.username, user.password, user.univ ],
     (err, res) => {
       if (err) {
@@ -21,7 +21,7 @@ User.create = (user, result) => {
 }
 
 User.findByEmail = (email, result) => {
-  sql.query(`SELECT * FROM users WHERE email=?`, [email],
+  sql.query(`SELECT * FROM Users WHERE email=?`, [email],
     (err, res) => {
       if (err) {
         console.log('error occured in User.findByEmail', err);
