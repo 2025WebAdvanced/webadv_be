@@ -5,11 +5,6 @@ const mysql = require('mysql2');
 const cors = require('cors');
 
 const app = express();
-app.set('port', 8080);
-
-app.use(cors({
-	origin: 'http://localhost:3000'
-}))
 
 const connection = mysql.createConnection({
 	host: process.env.HOST,
@@ -19,16 +14,15 @@ const connection = mysql.createConnection({
 	database: 'test_db'
 });
 
-app.get('/', (req, res) => {
-    res.send('Hello, Express')
-		console.log('request appeared to root uri');
-})
+const postRouter = require('./routes/post')
 
-app.get('/test/json', (req, res) => {
-    res.json({
-			message: 'Hello, Express'
-		});
-})
+app.set('port', 8080);
+
+app.use(cors({
+	origin: 'http://localhost:3000'
+}))
+
+app.use('/post', postRouter);
 
 app.listen(app.get('port'), () => {
     console.log('Server is running on port', app.get('port'))
