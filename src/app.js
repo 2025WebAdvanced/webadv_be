@@ -14,7 +14,7 @@ const connection = mysql.createConnection({
 	database: 'test_db'
 });
 
-const postRouter = require('./routes/post')
+const postRouter = require('./routes/postService')
 
 app.set('port', 8080);
 
