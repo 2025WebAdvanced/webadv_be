@@ -1,18 +1,9 @@
 require('dotenv').config();
 
 const express = require('express');
-const mysql = require('mysql2');
 const cors = require('cors');
 
 const app = express();
-
-const connection = mysql.createConnection({
-	host: process.env.HOST,
-	user: process.env.USER_NAME,
-	password: process.env.ROOT_PASSWORD,
-	port: process.env.PORT,
-	database: 'test_db'
-});
 
 const postRouter = require('./routes/postService')
 
