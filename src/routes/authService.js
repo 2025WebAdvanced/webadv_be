@@ -3,7 +3,7 @@ const express = require('express');
 const User = require('../model/authModel');
 const router = express.Router();
 const bcrypt = require('bcrypt');
-const { jwtTokenProvider } = require('../middleware/jwt');
+const JWT = require('../middleware/jwt');
 require('dotenv').config();
 
 // 비밀번호 해싱 메소드
@@ -11,7 +11,34 @@ const hashedPassword = async (password) => {
   return await bcrypt.hash(password, 10);
 }
 
-// 로그인 API 예시
+// 액세스 토큰 재발급
+router.get('/reissue', (req, res) => {
+  if (!req.headers.authorization) {
+    return res.status(400).json({
+      code: 1900,
+      message: '필수 입력값이 없습니다.',
+    });
+  }
+  
+  const { err, accessToken, refreshToken } = JWT.jwtAccessTokenRefresher(req);
+  if (err) {
+    res.status(401).json({
+      code: err.code,
+      message: err.message,
+    })
+  } else {
+    res.status(200).json({
+      code: 1004,
+      message: '토큰이 재발급 되었습니다.',
+      data: {
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+      }
+    })
+  }
+});
+
+// 로그인
 router.post('/login', (req, res) => {
   const { email, password } = req.body;
 
@@ -37,7 +64,7 @@ router.post('/login', (req, res) => {
       } else {
         await bcrypt.compare(password, data[0].password, (err, result) => {
           if (result) {
-            const token = jwtTokenProvider(req.body);
+            const token = JWT.jwtTokenProvider(req.body);
             res.json({
               code: 1001,
               message: '로그인에 성공했습니다.',
@@ -55,6 +82,7 @@ router.post('/login', (req, res) => {
   });
 });
 
+// 회원 가입
 router.post('/signup', async (req, res) => {
   const { email, username, password, univ } = req.body;
 
