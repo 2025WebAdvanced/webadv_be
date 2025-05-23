@@ -1,4 +1,4 @@
-const sql = require('./db.js');
+const sql = require('../config/db.js');
 
 const Post = function(post) {
   this.title = post.title;
