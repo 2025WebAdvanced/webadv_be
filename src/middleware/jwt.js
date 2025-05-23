@@ -33,4 +33,4 @@ const jwtTokenProvider = (user) => {
   return { accessToken: accessToken, refreshToken: refreshToken };
 }
 
-module.exports = authMiddleware;
+module.exports = { jwtTokenExtractor, jwtTokenProvider };

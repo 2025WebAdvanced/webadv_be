@@ -3,7 +3,7 @@ const express = require('express');
 const User = require('../model/authModel');
 const router = express.Router();
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
+const { jwtTokenProvider } = require('../middleware/jwt');
 require('dotenv').config();
 
 // 비밀번호 해싱 메소드
@@ -37,7 +37,7 @@ router.post('/login', (req, res) => {
       } else {
         await bcrypt.compare(password, data[0].password, (err, result) => {
           if (result) {
-            const token = JWTTokenProvider(req.body);
+            const token = jwtTokenProvider(req.body);
             res.json({
               code: 1001,
               message: '로그인에 성공했습니다.',
