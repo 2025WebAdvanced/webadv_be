@@ -35,7 +35,7 @@ router.post('/', (req, res) => {
   });
 });
 
-router.get('/detail/:postId', (req, res) => {
+router.get('/:postId', (req, res) => {
   const { postId } = req.params;
 
   Post.findById(postId, (err, data) => {
@@ -49,6 +49,10 @@ router.get('/detail/:postId', (req, res) => {
         code: 1009,
         message: '게시글을 성공적으로 조회했습니다.',
         data: data,
+      })
+    } else {
+      return res.status(404).json({
+        message: '게시글이 존재하지 않습니다.',
       })
     }
   })
