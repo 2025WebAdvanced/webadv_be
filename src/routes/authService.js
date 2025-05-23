@@ -11,20 +11,6 @@ const hashedPassword = async (password) => {
   return await bcrypt.hash(password, 10);
 }
 
-const JWTTokenProvider = (user) => {
-  const accessToken = jwt.sign(
-    { id: user.id, email: user.email },
-    process.env.JWT_SECRET,
-    { expiresIn: '15m' }
-  )
-  const refreshToken = jwt.sign(
-    { id: user.id, email: user.email },
-    process.env.JWT_SECRET,
-    { expiresIn: '3h' }
-  )
-  return { accessToken: accessToken, refreshToken: refreshToken };
-}
-
 // 로그인 API 예시
 router.post('/login', (req, res) => {
   const { email, password } = req.body;
