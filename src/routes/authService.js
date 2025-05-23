@@ -3,10 +3,26 @@ const express = require('express');
 const User = require('../model/authModel');
 const router = express.Router();
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
 // 비밀번호 해싱 메소드
 const hashedPassword = async (password) => {
   return await bcrypt.hash(password, 10);
+}
+
+const JWTTokenProvider = (user) => {
+  const accessToken = jwt.sign(
+    { id: user.id, email: user.email },
+    process.env.JWT_SECRET,
+    { expiresIn: '15m' }
+  )
+  const refreshToken = jwt.sign(
+    { id: user.id, email: user.email },
+    process.env.JWT_SECRET,
+    { expiresIn: '3h' }
+  )
+  return { accessToken: accessToken, refreshToken: refreshToken };
 }
 
 // 로그인 API 예시
@@ -27,18 +43,28 @@ router.post('/login', (req, res) => {
         message: err.message || "알 수 없는 오류 발생"
       });
     } else {
-      await bcrypt.compare(password, data[0].password, (err, result) => {
-        if (result)
-          res.json({
-            code: 1001,
-            message: '로그인에 성공했습니다.'
-          });
-        else
-          res.status(400).json({
-            code: 1901,
-            message: `비밀번호가 일치하지 않습니다.`
-          });
-      });
+      if (data.length === 0) {
+        res.status(404).json({
+          code: 1902,
+          message: '존재하지 않는 사용자입니다.',
+        });
+      } else {
+        await bcrypt.compare(password, data[0].password, (err, result) => {
+          if (result) {
+            const token = JWTTokenProvider(req.body);
+            res.json({
+              code: 1001,
+              message: '로그인에 성공했습니다.',
+              accessToken: token.accessToken,
+              refreshToken: token.refreshToken,
+            });
+          } else
+            res.status(400).json({
+              code: 1901,
+              message: `비밀번호가 일치하지 않습니다.`
+            });
+        });
+      }
     }
   });
 });
