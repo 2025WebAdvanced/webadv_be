@@ -7,7 +7,7 @@ router.post('/', (req, res) => {
   const { title, content, userId } = req.body;
 
   if (!title || !content || !userId) {
-    res.status(400).json({
+    return res.status(400).json({
       code: 1900,
       message: '필수 입력값이 없습니다.',
     });
@@ -21,7 +21,7 @@ router.post('/', (req, res) => {
 
   Post.create(post, (err, data) => {
     if (err) {
-      res.status(500).send({
+      return res.status(500).json({
         message: err.message || "알 수 없는 에러 발생",
       });
     }
@@ -33,6 +33,25 @@ router.post('/', (req, res) => {
       });
     }
   });
+});
+
+router.get('/detail/:postId', (req, res) => {
+  const { postId } = req.params;
+
+  Post.findById(postId, (err, data) => {
+    if (err) {
+      return res.status(500).json({
+        message: err.message || "알 수 없는 에러 발생",
+      });
+    }
+    if (data) {
+      res.json({
+        code: 1009,
+        message: '게시글을 성공적으로 조회했습니다.',
+        data: data,
+      })
+    }
+  })
 });
 
 module.exports = router;
