@@ -7,15 +7,25 @@ const Post = function(post) {
 };
 
 Post.create = (post, result) => {
-  sql.query(`INSERT INTO Posts (title, content, createdAt, updatedAt, userId) VALUES (?, ?, NOW(), NOW(), ?)`,
-    [ post.title, post.content, post.userId ],
-    (err, res) => {
+  sql.query(`INSERT INTO posts (title, content, createdAt, updatedAt, userId) VALUES (?, ?, NOW(), NOW(), ?)`
+    , [post.title, post.content, post.userId]
+    , (err, res) => {
       if (err) {
-        console.log('error ocured in Posts.create: ', err);
-        result(err, null);
-      } else
-        result(null, {id: res.insertId, ...post});
-    });
+      console.log('error ocured in Posts.create: ', err);
+      result(err, null);
+    } else
+      result(null, {id: res.insertId, ...post});
+  });
+}
+
+Post.findById = (postId, result) => {
+  sql.query(`SELECT * FROM posts WHERE id=?`, [postId], (err, res) => {
+    if (err) {
+      console.log('error ocured in Posts.getAll: ', err);
+      result(err, null);
+    } else
+      result(null, res[0]);
+  })
 }
 
 Post.getAll = result => {
