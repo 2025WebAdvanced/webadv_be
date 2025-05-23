@@ -26,7 +26,7 @@ router.post('/signup', async (req, res) => {
     // 비밀번호 해싱
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // 사용자 저장
+    // 유저 생성ㄴ
     await sql.query(
       'INSERT INTO users (email, username, password) VALUES (?, ?, ?)',
       [email, username, hashedPassword]
