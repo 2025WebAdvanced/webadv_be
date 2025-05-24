@@ -3,7 +3,7 @@ const express = require('express');
 const User = require('../model/authModel');
 const router = express.Router();
 const bcrypt = require('bcrypt');
-const JWT = require('../middleware/jwt');
+const JWT = require('../config/jwt');
 require('dotenv').config();
 
 // 비밀번호 해싱 메소드
