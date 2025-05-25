@@ -1,9 +1,10 @@
 // src/routes/auth.js
 const express = require('express');
-const User = require('../model/authModel');
+const User = require('../model/userModel');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const JWT = require('../config/jwt');
+const authMiddleware = require('../middleware/authMiddleware');
 require('dotenv').config();
 
 // 비밀번호 해싱 메소드
@@ -56,13 +57,13 @@ router.post('/login', (req, res) => {
         message: err.message || "알 수 없는 오류 발생"
       });
     } else {
-      if (data.length === 0) {
+      if (!data) {
         res.status(404).json({
           code: 1902,
           message: '존재하지 않는 사용자입니다.',
         });
       } else {
-        await bcrypt.compare(password, data[0].password, (err, result) => {
+        await bcrypt.compare(password, data.password, (err, result) => {
           if (result) {
             const token = JWT.jwtTokenProvider(req.body);
             res.json({
@@ -101,7 +102,7 @@ router.post('/signup', async (req, res) => {
       res.status(500).send({
         message: err.message || "알 수 없는 오류 발생"
       });
-    } else if (data.length > 0) {
+    } else if (data) {
       return res.status(400).json({
         code: 1901,
         message: '이미 존재하는 이메일입니다.',
@@ -123,6 +124,38 @@ router.post('/signup', async (req, res) => {
       })
     }
   })
+});
+
+router.post('/withdrawal', authMiddleware, (req, res) => {
+  if (!req.body.password) {
+    return res.status(400).json({
+      code: 1900,
+      message: '필수 입력값이 없습니다.',
+    });
+  }
+
+  bcrypt.compare(req.body.password, req.user.password, (err, result) => {
+    if (err) {
+      return res.status(401).json({
+        code: 1901,
+        message: '비밀번호가 일치하지 않습니다.'
+      })
+    }
+    else {
+      User.delete(req.user.id, (err, data) => {
+        if (err) {
+          return res.status(500).json({
+            message: "서버 오류가 발생했습니다.",
+          });
+        } else {
+          return res.json({
+            code: 1003,
+            message: '회원 탈퇴에 성공했습니다.',
+          });
+        }
+      });
+    }
+  });
 });
 
 module.exports = router;
