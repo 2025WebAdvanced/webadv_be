@@ -51,4 +51,15 @@ Post.getAll = result => {
   })
 }
 
+Post.delete = (postId, result) => {
+  sql.query('DELETE FROM Posts WHERE id=?', [postId], (err, res) => {
+    if (err) {
+      console.log('error occured in Post.delete', err);
+      result(err, null);
+    } else {
+      result(null, res);
+    }
+  })
+}
+
 module.exports = Post;
