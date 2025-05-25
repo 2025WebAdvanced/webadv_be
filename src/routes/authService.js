@@ -1,10 +1,11 @@
 // src/routes/auth.js
 const express = require('express');
-const User = require('../model/userModel');
-const router = express.Router();
 const bcrypt = require('bcrypt');
+const router = express.Router();
 const JWT = require('../config/jwt');
 const authMiddleware = require('../middleware/authMiddleware');
+const User = require('../model/userModel');
+const Token = require('../model/tokenModel');
 require('dotenv').config();
 
 // 비밀번호 해싱 메소드
@@ -83,6 +84,31 @@ router.post('/login', (req, res) => {
   });
 });
 
+// 로그아웃
+router.post('/logout', authMiddleware, (req, res) => {
+  const expiresIn = JWT.getExpireFromRefreshToken(req.body.refresh).expiresIn;
+  const expiresDate = new Date(expiresIn * 1000);
+  const token = {
+    userId: req.user.id,
+    refreshToken: req.body.refresh,
+    expiresAt: expiresDate, 
+  }
+
+  Token.create(token, (err, data) => {
+    if (err) {
+      return res.status(500).json({
+        code: 5000,
+        message: '서버 오류가 발생했습니다.',
+      });
+    } else {
+      return res.json({
+        code: 1002,
+        message: '로그아웃에 성공했습니다.',
+      })
+    }
+  })
+})
+
 // 회원 가입
 router.post('/signup', async (req, res) => {
   const { email, username, password, univ } = req.body;
@@ -126,7 +152,7 @@ router.post('/signup', async (req, res) => {
   })
 });
 
-router.post('/withdrawal', authMiddleware, (req, res) => {
+router.post('/withdrawal', authMiddleware, async (req, res) => {
   if (!req.body.password) {
     return res.status(400).json({
       code: 1900,
@@ -134,7 +160,7 @@ router.post('/withdrawal', authMiddleware, (req, res) => {
     });
   }
 
-  bcrypt.compare(req.body.password, req.user.password, (err, result) => {
+  await bcrypt.compare(req.body.password, req.user.password, (err, result) => {
     if (err) {
       return res.status(401).json({
         code: 1901,
