@@ -7,6 +7,7 @@ const app = express();
 
 const postRouter = require('./routes/postService');
 const authRouter = require('./routes/authService');
+const commentRouter = require('./routes/commentService');
 
 app.set('port', 8080);
 
@@ -17,6 +18,7 @@ app.use(cors({
 
 app.use('/post', postRouter);
 app.use('/auth', authRouter);
+app.use('/comment', commentRouter);
 
 app.listen(app.get('port'), () => {
     console.log('Server is running on port', app.get('port'))
