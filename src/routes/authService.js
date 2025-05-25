@@ -86,6 +86,7 @@ router.post('/login', (req, res) => {
 
 // 로그아웃
 router.post('/logout', authMiddleware, (req, res) => {
+  // 리프레시 토큰 exp 추출
   const expiresIn = JWT.getExpireFromRefreshToken(req.body.refresh).expiresIn;
   const expiresDate = new Date(expiresIn * 1000);
   const token = {
@@ -94,6 +95,10 @@ router.post('/logout', authMiddleware, (req, res) => {
     expiresAt: expiresDate, 
   }
 
+  // 블랙리스트의 전체 토큰 중 기간 만료된 토큰 삭제
+  Token.deleteDeprecated();
+
+  // 토큰 블랙리스트에 추가
   Token.create(token, (err, data) => {
     if (err) {
       return res.status(500).json({
