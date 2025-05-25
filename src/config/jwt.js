@@ -6,6 +6,7 @@ const JWT = {
   user: {},
   accessToken: '',
   refreshToken: '',
+  expiresIn: null,
 
   jwtAccessTokenExtractor(req) {
     const authAccess = req.headers.authorization;
@@ -51,6 +52,27 @@ const JWT = {
     } catch (e) {
       this.err = {
         message: '토큰 추출 중 오류가 발생했습니다.',
+      };
+    }
+
+    return this;
+  },
+
+  getExpireFromRefreshToken(refreshToken) {
+    if (!refreshToken.startsWith('Bearer ')) {
+      this.err = { message: '리프레시 토큰이 없습니다.'};
+      return this;
+    }
+
+    const refresh = refreshToken.split(' ')[1];
+
+    try {
+      const decoded = jwt.verify(refresh, process.env.JWT_REFRESH_SECRET);
+      this.expiresIn = decoded.exp;
+    } catch (e) {
+      this.err = {
+        message: '토큰 추출 중 오류가 발생했습니다.',
+        error: e,
       };
     }
 
