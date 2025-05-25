@@ -82,4 +82,33 @@ router.post('/:commentId', authMiddleware, async (req, res) => {
   })
 });
 
+router.delete('/:commentId', authMiddleware, async (req, res) => {
+  const { commentId } = req.params;
+
+  Comment.getCommentById(commentId, (err, comment) => {
+    if (err) {
+      return res.status(404).json({
+        code: 3004,
+        message: '삭제할 댓글을 찾을 수 없습니다.',
+      });
+    }
+    if (comment && comment.id == req.user.id) {
+      Comment.delete(commentId, (err, data) => {
+        if (err) {
+          return res.status(500).json({
+            code: 5000,
+            message: '서버 오류가 발생했습니다.',
+          })
+        }
+        if (data) {
+          res.json({
+            code: 3003,
+            message: '댓글 삭제에 성공했습니다.',
+          })
+        }
+      })
+    }
+  })
+});
+
 module.exports = router;

@@ -32,6 +32,16 @@ Comment.update = (comment, result) => {
   )
 }
 
+Comment.delete = (commentId, result) => {
+  sql.query('DELETE From Comments WHERE id=?', [commentId], (err, res) => {
+    if (err) {
+      console.log('error occured in Comment.delete', err);
+      result(err, null);
+    } else
+      result(null, res);
+  })
+}
+
 Comment.getCommentById = (commentId, result) => {
   sql.query('SELECT * FROM Comments WHERE id=?', [commentId], (err, res) => {
     if (err) {
