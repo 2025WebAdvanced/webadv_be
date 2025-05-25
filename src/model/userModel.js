@@ -32,4 +32,15 @@ User.findByEmail = (email, result) => {
     });
 }
 
+User.delete = (userId, result) => {
+  sql.query('DELETE FROM Users WHERE id=?', [userId], (err, res) => {
+    if (err) {
+      console.log('error occured in User.delete', err);
+      result(err, null);
+    }
+    else
+      result(null, res);
+  })
+}
+
 module.exports = User;
