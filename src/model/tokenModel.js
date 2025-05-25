@@ -19,15 +19,13 @@ Token.create = (token, result) => {
   )
 }
 
-Token.delete = (userId, result) => {
-  sql.query('DELETE FROM Tokens WHERE userId=?'
-    , [userId]
+Token.deleteDeprecated = () => {
+  sql.query('delete from tokens where timediff(now(), expiresAt) > 0'
     , (err, res) => {
-      if (err) {
-        console.log('error occured in Token.delete', err);
-        result(err, null);
-      } else
-        result(null, res);
+      if (err)
+        console.log('error occured in Token.deleteDeprecated', err);
+      else
+        console.log('Deleted Successfully Deprecated RefreshTokens.\n', res);
     }
   )
 }
