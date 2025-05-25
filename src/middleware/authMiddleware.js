@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const User = require('../model/authModel');
 require('dotenv').config();
 
 function authMiddleware(req, res, next) {
@@ -12,8 +13,17 @@ function authMiddleware(req, res, next) {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded; // 토큰에 담긴 정보 req.user에 저장
-    next(); // 다음 미들웨어 또는 라우터로 진행
+
+    User.findByEmail(decoded.email, (err, data) => {
+      if (err) {
+        return res.status(500).json({
+          message: '서버 오류가 발생했습니다.',
+        });
+      } else {
+        req.user = data[0];
+        next();
+      }
+    })
   } catch (err) {
     return res.status(401).json({ message: '유효하지 않은 토큰입니다.' });
   }
