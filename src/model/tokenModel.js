@@ -20,7 +20,7 @@ Token.create = (token, result) => {
 }
 
 Token.deleteDeprecated = () => {
-  sql.query('delete from tokens where timediff(now(), expiresAt) > 0'
+  sql.query('DELETE FROM Tokens WHERE TIMEDIFF(NOW(), expiresAt) > 0'
     , (err, res) => {
       if (err)
         console.log('error occured in Token.deleteDeprecated', err);
@@ -31,11 +31,24 @@ Token.deleteDeprecated = () => {
 }
 
 Token.findByUserId = (userId, result) => {
-  sql.query('SELECT FROM Tokens WHERE userId=?'
+  sql.query('SELECT * FROM Tokens WHERE userId=?'
     , [userId]
     , (err, res) => {
       if (err) {
         console.log('error occured in Token.findByUserId', err);
+        result(err, null);
+      } else
+        result(null, res);
+    }
+  )
+}
+
+Token.findByRefreshToken = (token, result) => {
+  sql.query('SELECT * FROM Tokens WHERE refreshToken=?'
+    , [token]
+    , (err, res) => {
+      if (err) {
+        console.log('error occured in Token.findByRefreshToken', err);
         result(err, null);
       } else
         result(null, res);
