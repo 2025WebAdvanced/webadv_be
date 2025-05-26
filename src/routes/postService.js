@@ -18,7 +18,7 @@ router.post('/', authMiddleware, (req, res) => {
   const post = new Post({
     title: req.body.title,
     content: req.body.content,
-    userId: req.body.userId,
+    userId: req.user.id,
   });
 
   Post.create(post, (err, data) => {
@@ -37,11 +37,49 @@ router.post('/', authMiddleware, (req, res) => {
   });
 });
 
+// 게시글 목록 조회 (페이지네이션)
+router.get('/list', (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+
+  Post.getPosts(page, limit, (err, posts) => {
+    if (err) {
+      return res.status(500).json({
+        code: 1500,
+        message: '서버 오류가 발생했습니다\n' + err, 
+      });
+    }
+    if (posts) {
+      Post.getTotalPostCount((err, postCount) => {
+        if (err) {
+          return res.status(500).json({
+            code: 1500,
+            message: '서버 오류가 발생했습니다\n' + err,
+          });
+        }
+        if (postCount) {
+          return res.json({
+            code: 1000,
+            message: '게시글 목록 조회 성공',
+            data: {
+              currentPage: page,
+              totalPages: Math.ceil(postCount / limit),
+              totalPosts: postCount,
+              posts,
+            },
+          });
+        }
+      });
+    }
+  });
+});
 
 // 게시글 조회
 router.get('/:postId', (req, res, next) => {
   if (req.headers.authorization)
     authMiddleware(req, res, next);
+  else
+    next();
 }, (req, res) => {
   const { postId } = req.params;
   const userId = req.user?.userId;
@@ -68,6 +106,8 @@ router.get('/:postId', (req, res, next) => {
     }
   })
 });
+
+
 
 // 게시글 수정
 router.post('/:postId', authMiddleware, async (req, res) => {
