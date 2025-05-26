@@ -98,20 +98,37 @@ router.post('/logout', authMiddleware, (req, res) => {
   // 블랙리스트의 전체 토큰 중 기간 만료된 토큰 삭제
   Token.deleteDeprecated();
 
-  // 토큰 블랙리스트에 추가
-  Token.create(token, (err, data) => {
+  Token.findByRefreshToken(req.body.refresh, (err, data) => {
     if (err) {
       return res.status(500).json({
         code: 5000,
-        message: '서버 오류가 발생했습니다.',
+        message: '서버 오류가 발생했습니다.\n' + err,
       });
     } else {
-      return res.json({
-        code: 1002,
-        message: '로그아웃에 성공했습니다.',
-      })
+      console.log(data);
+      if (data.length > 0) {
+        return res.status(401).json({
+          code: 4001,
+          message: '로그아웃한 사용자의 리프레시 토큰입니다.',
+        })
+      } else {
+        // 토큰 블랙리스트에 추가
+        Token.create(token, (err, data) => {
+          if (err) {
+            return res.status(500).json({
+              code: 5000,
+              message: '서버 오류가 발생했습니다.',
+            });
+          } else {
+            return res.json({
+              code: 1002,
+              message: '로그아웃에 성공했습니다.',
+            })
+          }
+        });
+      }
     }
-  })
+  });
 })
 
 // 회원 가입
