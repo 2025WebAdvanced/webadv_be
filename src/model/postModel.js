@@ -62,4 +62,31 @@ Post.delete = (postId, result) => {
   })
 }
 
+Post.getPosts = (page = 1, limit = 10, result) => {
+  const offset = (page - 1) * limit;
+  sql.query(
+    'SELECT p.id, p.title, p.createdAt, p.updatedAt, u.username, p.comments FROM Posts p JOIN Users u ON p.userId = u.id ORDER BY p.createdAt DESC LIMIT ? OFFSET ?',
+    [limit, offset],
+    (err, rows) => {
+      if (err) { 
+        console.log('error occured in Post.getPosts', err);
+        result(err, null);
+      } else {
+        result(null, rows);
+      }
+    }
+  );
+}
+
+Post.getTotalPostCount = result => {
+  sql.query('SELECT COUNT(*) as count FROM Posts', (err, rows) => {
+    if (err) {
+      console.log('error occured in Post.getTotalPostCount', err);
+      result(err, null);
+    } else {
+      result(null, rows[0].count);
+    }
+  });
+}
+
 module.exports = Post;
