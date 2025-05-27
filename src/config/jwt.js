@@ -8,7 +8,7 @@ const JWT = {
   refreshToken: '',
   expiresIn: null,
 
-  jwtAccessTokenExtractor(req) {
+  async jwtAccessTokenExtractor(req) {
     const authAccess = req.headers.authorization;
 
     if (!authAccess || !authAccess.startsWith('Bearer ')) {
@@ -19,7 +19,7 @@ const JWT = {
     const access = authAccess.split(' ')[1];
 
     try {
-      const decoded = jwt.verify(access, process.env.JWT_SECRET);
+      const decoded = await jwt.verify(access, process.env.JWT_SECRET);
       this.user = {
         email: decoded.email,
         username: decoded.username,
@@ -33,7 +33,7 @@ const JWT = {
     return this;
   },
 
-  jwtRefreshTokenExtractor(req) {
+  async jwtRefreshTokenExtractor(req) {
     const authRefresh = req.headers.authorization;
 
     if (!authRefresh || !authRefresh.startsWith('Bearer ')) {
@@ -44,7 +44,7 @@ const JWT = {
     const refresh = authRefresh.split(' ')[1];
 
     try {
-      const decoded = jwt.verify(refresh, process.env.JWT_REFRESH_SECRET);
+      const decoded = await jwt.verify(refresh, process.env.JWT_REFRESH_SECRET);
       this.user = {
         email: decoded.email,
         username: decoded.username,
@@ -58,7 +58,7 @@ const JWT = {
     return this;
   },
 
-  getExpireFromRefreshToken(refreshToken) {
+  async getExpireFromRefreshToken(refreshToken) {
     if (!refreshToken.startsWith('Bearer ')) {
       this.err = { message: '리프레시 토큰이 없습니다.'};
       return this;
@@ -67,7 +67,7 @@ const JWT = {
     const refresh = refreshToken.split(' ')[1];
 
     try {
-      const decoded = jwt.verify(refresh, process.env.JWT_REFRESH_SECRET);
+      const decoded = await jwt.verify(refresh, process.env.JWT_REFRESH_SECRET);
       this.expiresIn = decoded.exp;
     } catch (e) {
       this.err = {
@@ -101,7 +101,7 @@ const JWT = {
     return this;
   },
 
-  jwtAccessTokenRefresher(req) {
+  async jwtAccessTokenRefresher(req) {
     const authRefresh = req.headers.authorization;
 
     if (!authRefresh || !authRefresh.startsWith('Bearer')) {
@@ -112,7 +112,7 @@ const JWT = {
       return this;
     }
 
-    const result = this.jwtRefreshTokenExtractor(req);
+    const result = await this.jwtRefreshTokenExtractor(req);
     if (result.err) {
       this.err = {
         code: 1907,
@@ -121,7 +121,7 @@ const JWT = {
       return this;
     }
 
-    return this.jwtTokenProvider(this.user);
+    return await this.jwtTokenProvider(this.user);
   }
 };
 
