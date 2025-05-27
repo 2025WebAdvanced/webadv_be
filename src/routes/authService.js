@@ -14,7 +14,7 @@ const hashedPassword = async (password) => {
 }
 
 // 액세스 토큰 재발급
-router.get('/reissue', (req, res) => {
+router.get('/reissue', async (req, res) => {
   if (!req.headers.authorization) {
     return res.status(400).json({
       code: 1900,
@@ -22,7 +22,7 @@ router.get('/reissue', (req, res) => {
     });
   }
   
-  const { err, accessToken, refreshToken } = JWT.jwtAccessTokenRefresher(req);
+  const { err, accessToken, refreshToken } = await JWT.jwtAccessTokenRefresher(req);
   if (err) {
     res.status(401).json({
       code: err.code,
@@ -96,9 +96,9 @@ router.post('/login', async (req, res) => {
 });
 
 // 로그아웃
-router.post('/logout', authMiddleware, (req, res) => {
+router.post('/logout', authMiddleware, async (req, res) => {
   // 리프레시 토큰 exp 추출
-  const expiresIn = JWT.getExpireFromRefreshToken(req.body.refresh).expiresIn;
+  const expiresIn = await JWT.getExpireFromRefreshToken(req.body.refresh).expiresIn;
   const expiresDate = new Date(expiresIn * 1000);
   const token = {
     userId: req.user.id,
