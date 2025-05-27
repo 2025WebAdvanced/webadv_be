@@ -7,7 +7,7 @@ const Post = function(post) {
 };
 
 Post.create = (post, result) => {
-  sql.query(`INSERT INTO posts (title, content, createdAt, updatedAt, userId) VALUES (?, ?, NOW(), NOW(), ?)`
+  sql.query(`INSERT INTO Posts (title, content, createdAt, updatedAt, userId) VALUES (?, ?, NOW(), NOW(), ?)`
     , [post.title, post.content, post.userId]
     , (err, res) => {
       if (err) {
@@ -19,7 +19,7 @@ Post.create = (post, result) => {
 }
 
 Post.updatePost = (post, result) => {
-  sql.query(`UPDATE posts SET title=?, content=? WHERE id=?`
+  sql.query(`UPDATE Posts SET title=?, content=? WHERE id=?`
     , [post.title, post.content, post.id]
     , (err, res) => {
       if (err) {
@@ -32,7 +32,7 @@ Post.updatePost = (post, result) => {
 }
 
 Post.findById = (postId, result) => {
-  sql.query(`SELECT * FROM posts WHERE id=?`, [postId], (err, res) => {
+  sql.query(`SELECT * FROM Posts WHERE id=?`, [postId], (err, res) => {
     if (err) {
       console.log('error ocured in Posts.getAll: ', err);
       result(err, null);
