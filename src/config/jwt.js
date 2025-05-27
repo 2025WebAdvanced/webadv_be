@@ -79,15 +79,15 @@ const JWT = {
     return this;
   },
 
-  jwtTokenProvider(user) {
+  async jwtTokenProvider(user) {
     try {
-      this.accessToken = 'Bearer ' + jwt.sign(
+      this.accessToken = 'Bearer ' + await jwt.sign(
         { email: user.email, username: user.username },
         process.env.JWT_SECRET,
         { expiresIn: '15m' }
       );
 
-      this.refreshToken = 'Bearer ' + jwt.sign(
+      this.refreshToken = 'Bearer ' + await jwt.sign(
         { id: user.id, email: user.email },
         process.env.JWT_REFRESH_SECRET, // 수정: 이 부분도 다른 secret을 사용
         { expiresIn: '1h' }

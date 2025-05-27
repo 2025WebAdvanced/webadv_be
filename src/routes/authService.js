@@ -41,7 +41,7 @@ router.get('/reissue', (req, res) => {
 });
 
 // 로그인
-router.post('/login', (req, res) => {
+router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -51,36 +51,47 @@ router.post('/login', (req, res) => {
     });
   }
 
-  User.findByEmail(email, async (err, data) => {
+  await User.findByEmail(email, async (err, data) => {
     if (err) {
       console.log(err.message);
-      res.status(500).send({
+      return res.status(500).send({
         message: err.message || "알 수 없는 오류 발생"
       });
-    } else {
-      if (!data) {
-        res.status(404).json({
-          code: 1902,
-          message: '존재하지 않는 사용자입니다.',
-        });
-      } else {
-        await bcrypt.compare(password, data.password, (err, result) => {
-          if (result) {
-            const token = JWT.jwtTokenProvider(req.body);
-            res.json({
-              code: 1001,
-              message: '로그인에 성공했습니다.',
-              accessToken: token.accessToken,
-              refreshToken: token.refreshToken,
-            });
-          } else
-            res.status(400).json({
-              code: 1901,
-              message: `비밀번호가 일치하지 않습니다.`
-            });
+    } 
+    if (!data) {
+      return res.status(404).json({
+        code: 1902,
+        message: '존재하지 않는 사용자입니다.',
+      });
+    }
+    await bcrypt.compare(password, data.password, async (bcryptErr, result) => {
+      if (bcryptErr) {
+        return res.status(500).json({
+          message: "서버 오류가 발생했습니다."
         });
       }
-    }
+      if (!result) {
+        return res.status(400).json({
+          code: 1901,
+          message: '비밀번호가 일치하지 않습니다.'
+        });
+      }
+
+      const { err, accessToken, refreshToken } = await JWT.jwtTokenProvider(data);
+      if (err) {
+        return res.status(500).json({
+          message: "토큰 생성 중 오류가 발생했습니다."
+        });
+      }
+      if (data) {
+        return res.json({
+          code: 1001, 
+          message: '로그인에 성공했습니다.',
+          accessToken: accessToken,
+          refreshToken: refreshToken,
+        });
+      }
+    });
   });
 });
 
