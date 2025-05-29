@@ -13,8 +13,15 @@ Post.create = (post, result) => {
       if (err) {
       console.log('error ocured in Posts.create: ', err);
       result(err, null);
-    } else
-      result(null, {id: res.insertId, ...post});
+    } else {
+      sql.query(`UPDATE Users SET posts = posts + 1 WHERE id=?`, [post.userId], (errUser, resUser) => {
+        if (errUser) {
+          console.log('error occured in Posts.create: ', err);
+          result (errUser, null);
+        } else
+          result(null, {id: res.insertId, ...post});
+      })
+    }
   });
 }
 
