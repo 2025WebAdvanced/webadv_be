@@ -17,8 +17,43 @@ const getTotalCommentsCount = async (postId) => {
   return result.total;
 };
 
+const createComment = async (comment) => {
+  const [result] = await db.query(
+    'INSERT INTO Comments (content, userId, postId) VALUES (?, ?, ?)',
+    [comment.content, comment.userId, comment.postId]
+  );
+  return result;
+};
+
+const updateComment = async (comment) => {
+  const [result] = await db.query(
+    'UPDATE Comments SET content = ? WHERE id = ?',
+    [comment.content, comment.id]
+  );
+  return result;
+};
+
+const deleteComment = async (commentId) => {
+  const [result] = await db.query(
+    'DELETE FROM Comments WHERE id = ?',
+    [commentId]
+  );
+  return result;
+};
+
+const getCommentById = async (commentId) => {
+  const [rows] = await db.query(
+    'SELECT * FROM Comments WHERE id = ?',
+    [commentId]
+  );
+  return rows[0];
+};
+
 module.exports = {
   getCommentsByPostId,
   getTotalCommentsCount,
+  createComment,
+  updateComment,
+  deleteComment,
+  getCommentById,
 };
-
