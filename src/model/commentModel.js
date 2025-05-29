@@ -1,4 +1,4 @@
-kconst sql = require('../config/db');
+const sql = require('../config/db');
 
 const Comment = function(comment) {
   this.content = comment.content;
@@ -81,5 +81,12 @@ Comment.getTotalCommentsCount = async (postId) => {
   return result.total;
 };
 
+<<<<<<< HEAD
 module.exports = Comment;
+=======
+module.exports = {
+  getCommentsByPostId,
+  getTotalCommentsCount,
+};
+>>>>>>> 44ccfd9 (feat: 댓글조회 DB접근(페이지네이션))
 
