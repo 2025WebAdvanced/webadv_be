@@ -18,7 +18,7 @@ router.post('/', authMiddleware, (req, res) => {
   const post = new Post({
     title: req.body.title,
     content: req.body.content,
-    userId: req.user.userId,
+    userId: req.user.id,
   });
 
   Post.create(post, (err, data) => {
