@@ -1,34 +1,24 @@
 require('dotenv').config();
 
 const express = require('express');
-const mysql = require('mysql2');
-
-const connection = mysql.createConnection({
-	host: 'localhost',
-	user: process.env.USER_NAME,
-	password: process.env.ROOT_PASSWORD,
-	port: process.env.PORT,
-	database: 'test_db'
-});
+const cors = require('cors');
 
 const app = express();
+
+const postRouter = require('./routes/postService');
+const authRouter = require('./routes/authService');
+const commentRouter = require('./routes/commentService');
+
 app.set('port', 8080);
 
-const getAllUsers = () => {
-	connection.query('select * from users order by id desc', (err, rows, fields) => {
-		if(err) throw err;
-		console.log(rows);
-		return rows;
-	});
-}
+app.use(express.json());
+app.use(cors({
+	origin: 'http://localhost:3000'
+}))
 
-app.get('/', (req, res) => {
-    res.send('Hello, Express')
-})
-
-app.get('/getUsers', (req, res) => {
-    res.json(getAllUsers());
-})
+app.use('/post', postRouter);
+app.use('/auth', authRouter);
+app.use('/comment', commentRouter);
 
 app.listen(app.get('port'), () => {
     console.log('Server is running on port', app.get('port'))
