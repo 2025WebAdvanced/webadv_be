@@ -25,9 +25,10 @@ function authMiddleware(req, res, next) {
       }
     })
   } catch (err) {
-    return res.status(401).json({ 
+    return res.status(401).json({
       code: 4010,
       message: '유효하지 않은 토큰입니다.',
+      err: err,
     });
   }
 }
