@@ -79,6 +79,7 @@ router.post('/login', async (req, res) => {
 
       const { err, accessToken, refreshToken } = await JWT.jwtTokenProvider(data);
       if (err) {
+        console.log(err);
         return res.status(500).json({
           message: "토큰 생성 중 오류가 발생했습니다."
         });
@@ -98,7 +99,8 @@ router.post('/login', async (req, res) => {
 // 로그아웃
 router.post('/logout', authMiddleware, async (req, res) => {
   // 리프레시 토큰 exp 추출
-  const expiresIn = await JWT.getExpireFromRefreshToken(req.body.refresh).expiresIn;
+  const jwtResult = await JWT.getExpireFromRefreshToken(req.body.refresh);
+  const expiresIn = jwtResult.expiresIn;
   const expiresDate = new Date(expiresIn * 1000);
   const token = {
     userId: req.user.id,
