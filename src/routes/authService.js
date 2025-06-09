@@ -3,9 +3,10 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const router = express.Router();
 const JWT = require('../config/jwt');
-const authMiddleware = require('../middleware/authMiddleware');
 const User = require('../model/userModel');
 const Token = require('../model/tokenModel');
+const nodemailer = require('nodemailer');
+const authMiddleware = require('../middleware/authMiddleware');
 require('dotenv').config();
 
 // 비밀번호 해싱 메소드
@@ -239,13 +240,14 @@ router.post('/mailVerify', async (req, res) => {
       },
     });
 
+    
     const mailOptions = {
-      from: `"Community <${process.env.EMAIL_USER}>`,
-      to: email,
+      from: `Community`,
+      to: req.body.email,
       subject: '이메일 인증 코드',
-      text: `${email} 님의 인증 코드는 ${code} 입니다. 본인이 요청한 것이 아니라면 무시하세요.`,
+      text: `${req.body.email} 님의 인증 코드는 **${code}** 입니다. 본인이 요청한 것이 아니라면 무시하세요.`,
     };
-
+    
     await transporter.sendMail(mailOptions);
     
     res.json({
