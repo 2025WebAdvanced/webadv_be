@@ -1,8 +1,8 @@
-const sql = require('../config/db');
+const db = require('../config/db');
 
 const Comment = function(comment) {
   this.content = comment.content;
-}
+};
 
 Comment.create = (comment, result) => {
   sql.query(
@@ -16,8 +16,8 @@ Comment.create = (comment, result) => {
         result(null, res);
       }
     }
-  );
-}
+  });
+};
 
 Comment.update = (comment, result) => {
   sql.query(
@@ -82,4 +82,3 @@ Comment.getTotalCommentsCount = async (postId) => {
 };
 
 module.exports = Comment;
-
