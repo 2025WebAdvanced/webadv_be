@@ -5,7 +5,7 @@ const User = require('../model/userModel');
 require('dotenv').config();
 
 router.get('/detail', authMiddleware, (req, res) => {
-  if (!req.user.id || !req.user.email || !req.uesr.username || !req.user.univ) {
+  if (!req.user) {
     return res.status(403).json({
       message: '권한이 없습니다.'
     })
