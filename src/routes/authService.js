@@ -252,7 +252,7 @@ router.post('/mailVerify', async (req, res) => {
     
     res.json({
       message: '인증 이메일이 전송되었습니다.',
-      veerifyCode: code,
+      verifyCode: code,
     });
   } catch (e) {
     console.log('이메일 전송 오류', e);
