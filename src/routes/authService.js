@@ -219,4 +219,45 @@ router.post('/withdrawal', authMiddleware, async (req, res) => {
   });
 });
 
+router.post('/mailVerify', async (req, res) => {
+  if (!req.body.email) {
+    return res.status(400).json({
+      message: '필수 입력값이 없습니다.'
+    });
+  }
+  
+  try {
+    var code = '';
+    for(i = 0; i < 4; i++)
+      code += Math.floor(Math.random() * 10).toString();
+
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    const mailOptions = {
+      from: `"Community <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: '이메일 인증 코드',
+      text: `${email} 님의 인증 코드는 ${code} 입니다. 본인이 요청한 것이 아니라면 무시하세요.`,
+    };
+
+    await transporter.sendMail(mailOptions);
+    
+    res.json({
+      message: '인증 이메일이 전송되었습니다.',
+      veerifyCode: code,
+    });
+  } catch (e) {
+    console.log('이메일 전송 오류', e);
+    res.status(500).json({
+      message: '이메일 전송에 실패했습니다.',
+    });
+  }
+});
+
 module.exports = router;
