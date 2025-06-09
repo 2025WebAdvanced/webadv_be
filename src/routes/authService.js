@@ -197,7 +197,7 @@ router.post('/withdrawal', authMiddleware, async (req, res) => {
   }
 
   await bcrypt.compare(req.body.password, req.user.password, (err, result) => {
-    if (err) {
+    if (!result) {
       return res.status(401).json({
         code: 1901,
         message: '비밀번호가 일치하지 않습니다.'

@@ -5,6 +5,11 @@ const User = require('../model/userModel');
 require('dotenv').config();
 
 router.get('/detail', authMiddleware, (req, res) => {
+  if (!req.user.id || !req.user.email || !req.uesr.username || !req.user.univ) {
+    return res.status(403).json({
+      message: '권한이 없습니다.'
+    })
+  }
   return res.json({
     code: 1014,
     message: '유저 정보가 조회되었습니다.',
