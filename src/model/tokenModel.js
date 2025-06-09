@@ -8,7 +8,7 @@ const Token = function(token) {
 
 Token.create = (token, result) => {
   sql.query('INSERT INTO Tokens (userId, refreshToken, expiresAt) VALUES (?, ?, ?)'
-    ,[token.userId, token.refreshToken, token.expiresDate]
+    ,[token.userId, token.refreshToken, token.expiresAt]
     , (err, res) => {
       if (err) {
         console.log('error occured in Token.create', err);
@@ -25,7 +25,7 @@ Token.deleteDeprecated = () => {
       if (err)
         console.log('error occured in Token.deleteDeprecated', err);
       else
-        console.log('Deleted Successfully Deprecated RefreshTokens.\n', res);
+        console.log('Deleted Successfully Deprecated RefreshTokens.');
     }
   )
 }
