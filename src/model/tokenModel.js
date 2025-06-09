@@ -7,8 +7,8 @@ const Token = function(token) {
 };
 
 Token.create = (token, result) => {
-  sql.query('INSERT INTO Tokens (userId, refreshToken, expiresAt) VALUES (?, ?, ?)'
-    ,[token.userId, token.refreshToken, token.expiresAt]
+  sql.query('INSERT INTO Tokens (userId, refreshToken, expiresAt) VALUES (?, ?, NOW())'
+    ,[token.userId, token.refreshToken]
     , (err, res) => {
       if (err) {
         console.log('error occured in Token.create', err);
