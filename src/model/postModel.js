@@ -39,9 +39,9 @@ Post.updatePost = (post, result) => {
 }
 
 Post.findById = (postId, result) => {
-  sql.query(`SELECT * FROM Posts WHERE id=?`, [postId], (err, res) => {
+  sql.query(`SELECT Posts.*, Users.username  FROM Posts JOIN Users ON Users.id=userId WHERE Posts.id=?`, [postId], (err, res) => {
     if (err) {
-      console.log('error ocured in Posts.getAll: ', err);
+      console.log('error ocured in Posts.findById: ', err);
       result(err, null);
     } else
       result(null, res[0]);
