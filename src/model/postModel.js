@@ -26,14 +26,14 @@ Post.create = (post, result) => {
 }
 
 Post.updatePost = (post, result) => {
-  sql.query(`UPDATE Posts SET title=?, content=? WHERE id=?`
+  sql.query(`UPDATE Posts SET title=?, content=?, updatedAt=NOW() WHERE id=?`
     , [post.title, post.content, post.id]
     , (err, res) => {
       if (err) {
         console.log('error ocured in Posts.updatePost: ', err);
         result(err, null);
       } else
-        result(null, {...post});
+        result(null, { ...post });
     }
   )
 }

@@ -143,13 +143,13 @@ router.post('/:postId', authMiddleware, async (req, res) => {
       });
     }
     if (data) {
-      if (rows[0].userId !== req.user.userId) {
+      if (data.userId !== req.user.id) {
         return res.status(403).json({
           code: 4003,
           message: '본인의 게시글만 수정할 수 있습니다.',
         });
       } else {
-        Post.updatePost({ ...data.post, title: title, content: content,},
+        Post.updatePost({ ...data.post, id: postId, title: title, content: content,},
           (e, d) => {
             if (e)
               return res.status(500).json({ message: e.message || "알 수 없는 에러 발생" });
