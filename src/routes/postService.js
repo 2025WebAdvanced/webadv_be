@@ -2,6 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const Post = require('../model/postModel');
+const Comment = require('../model/commentModel');
 const authMiddleware = require('../middleware/authMiddleware');
 
 // 게시글 작성
@@ -76,38 +77,47 @@ router.get('/list', (req, res) => {
 
 // 게시글 조회
 router.get('/:postId', (req, res, next) => {
-  if (req.headers.authorization)
+  if (req.headers.authorization && req.headers.authorization !== 'null')
     authMiddleware(req, res, next);
   else
     next();
-}, (req, res) => {
+}, async (req, res) => {
   const { postId } = req.params;
-  const userId = req.user?.userId;
+  const userId = req.user?.id;
 
-  Post.findById(postId, (err, data) => {
+  Post.findById(postId, (err, post) => {
     if (err) {
       return res.status(500).json({
         message: err.message || "알 수 없는 에러 발생",
       });
     }
-    if (data) {
-      res.json({
-        code: 1009,
-        message: '게시글을 성공적으로 조회했습니다.',
-        data: {
-          ...data,
-          isAuthor: userId && userId === data.userId,
+    if (post) {
+      Comment.getAllCommentsByPostId(postId, (err, comments) => {
+        if (err) {
+          return res.status(500).json({
+            message: err.message || "알 수 없는 에러 발생",
+          });
         }
-      })
+        for (let i = 0; i < comments.length; i++)
+          comments[i] = {...comments[i], isAuthor: (userId && userId == comments[i].userId) || false};
+        res.json({
+          code: 1009,
+          message: '게시글을 성공적으로 조회했습니다.',
+          data: {
+            ...post,
+            isAuthor: (userId && userId === post.userId) || false,
+            comments: [...comments],
+          }
+        });
+      });
     } else {
       return res.status(404).json({
+        code: 4040,
         message: '게시글이 존재하지 않습니다.',
       })
     }
   })
 });
-
-
 
 // 게시글 수정
 router.post('/:postId', authMiddleware, async (req, res) => {
