@@ -18,7 +18,7 @@ router.post('/', authMiddleware, async (req, res) => {
   const comment = {
     content: content,
     userId: userId,
-    postId: postId,
+    postId: parseInt(postId),
   }
 
   Comment.create(comment, (err, data) => {
@@ -31,6 +31,9 @@ router.post('/', authMiddleware, async (req, res) => {
       return res.json({
         code: 3001,
         message: '댓글 작성에 성공했습니다.',
+        data: {
+          ...data,
+        }
       })
     }
   });
@@ -78,7 +81,7 @@ router.post('/:commentId', authMiddleware, async (req, res) => {
           }
         });
       }
-    };
+    }
   })
 });
 
@@ -92,7 +95,7 @@ router.delete('/:commentId', authMiddleware, async (req, res) => {
         message: '삭제할 댓글을 찾을 수 없습니다.',
       });
     }
-    if (comment && comment.id == req.user.id) {
+    if (comment && comment.id == commentId) {
       Comment.delete(commentId, (err, data) => {
         if (err) {
           return res.status(500).json({
