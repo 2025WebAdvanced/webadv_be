@@ -69,6 +69,11 @@ router.get('/list', (req, res) => {
               posts,
             },
           });
+        } else {
+          return res.status(404).json({
+            code: 4041,
+            message: '등록된 게시글이 없습니다.',
+          })
         }
       });
     }
